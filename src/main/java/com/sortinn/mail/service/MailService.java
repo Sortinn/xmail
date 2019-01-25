@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 /**
  * @author tian.gao
@@ -31,6 +34,13 @@ public class MailService {
         System.out.println("Hello World");
     }
 
+    /**
+     * 简单邮件发送
+     *
+     * @param to
+     * @param subject
+     * @param content
+     */
     public void sendSimpleMail(String to, String subject, String content) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
@@ -41,6 +51,21 @@ public class MailService {
 
         try {
             mailSender.send(mailMessage);
+            LOGGER.info("邮件发送成功, from:{}, to:{}, subject:{}", from, to, subject);
+        } catch (Exception e) {
+            LOGGER.error("邮件发送异常", e);
+        }
+    }
+
+    public void sendHtmlMail(String to, String subject, String content) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+        mimeMessageHelper.setFrom(from);
+        mimeMessageHelper.setTo(to);
+        mimeMessageHelper.setSubject(subject);
+        mimeMessageHelper.setText(content, true);
+        try {
+            mailSender.send(mimeMessage);
             LOGGER.info("邮件发送成功, from:{}, to:{}, subject:{}", from, to, subject);
         } catch (Exception e) {
             LOGGER.error("邮件发送异常", e);
