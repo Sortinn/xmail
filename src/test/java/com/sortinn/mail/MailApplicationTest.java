@@ -52,6 +52,18 @@ public class MailApplicationTest {
         mailService.sendAttachmentMail(SEND_TO, "book附件", "附件中是一本书的pdf", filePath);
     }
 
+    @Test
+    public void inlineMailSendTest() throws MessagingException {
+        String resId = "ford001";
+        String resPath = "/Users/sortinn/sortinn/images/壁纸/ford_gt40_le_mans_1969-wallpaper-2560x1600.jpg";
+        String content = "<html>\n" +
+                "<body>福特跑车图片\n" +
+                "<img src=\'resId:" + resId + "\'></img>" +
+                "</body>" +
+                "</html>";
+        mailService.sendInlineResourceMail(SEND_TO, "Ford Auto", content, resId, resPath);
+    }
+
 
 }
 

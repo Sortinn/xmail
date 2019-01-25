@@ -81,6 +81,15 @@ public class MailService {
         }
     }
 
+
+    /**
+     * 带附件的邮件发送
+     * @param to
+     * @param subject
+     * @param content
+     * @param filePath 附件地址
+     * @throws MessagingException
+     */
     public void sendAttachmentMail(String to, String subject, String content, String filePath) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
@@ -92,6 +101,30 @@ public class MailService {
         FileSystemResource file = new FileSystemResource(new File(filePath));
         String filename = file.getFilename();
         helper.addAttachment(filename, file);
+        mailSender.send(mimeMessage);
+    }
+
+
+    /**
+     * 图片邮件发送
+     * @param to
+     * @param subject
+     * @param content
+     * @param resId 图片id
+     * @param resPath 图片路径
+     * @throws MessagingException
+     */
+    public void sendInlineResourceMail(String to, String subject, String content, String resId, String resPath) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
+        FileSystemResource res = new FileSystemResource(new File(resPath));
+        helper.addInline(resId, res);
+
         mailSender.send(mimeMessage);
     }
 }
