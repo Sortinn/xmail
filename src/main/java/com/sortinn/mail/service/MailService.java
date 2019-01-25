@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
 
 /**
  * @author tian.gao
@@ -57,6 +59,13 @@ public class MailService {
         }
     }
 
+    /**
+     * HTML邮件发送
+     * @param to
+     * @param subject
+     * @param content
+     * @throws MessagingException
+     */
     public void sendHtmlMail(String to, String subject, String content) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -70,5 +79,19 @@ public class MailService {
         } catch (Exception e) {
             LOGGER.error("邮件发送异常", e);
         }
+    }
+
+    public void sendAttachmentMail(String to, String subject, String content, String filePath) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(content,true);
+
+        FileSystemResource file = new FileSystemResource(new File(filePath));
+        String filename = file.getFilename();
+        helper.addAttachment(filename, file);
+        mailSender.send(mimeMessage);
     }
 }
